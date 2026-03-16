@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<!--
+	Josiah Keene
+	index.html
+	2/9/26
+-->
+<html lang="en">
+	<head>
+		<title>ExploraStory</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="{% static 'explorastory_app/css/styles.css' %}">
+		<link href="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.css" rel="stylesheet">
+		<!-- <script src="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.js"></script> -->
+		<script defer src="{% static 'explorastory_app/js/index.js' %}"></script>
+	</head>
+
+	<body>
+		<div id="banner">
+			<header>
+				<img src="{% static 'explorastory_app/images/logo.png' %}" alt="explorastory logo" class="logo">
+				<p class="user-display">Username</p>
+			</header>
+
+			<nav>
+				<div id="default-menu" class="show">
+					<button id="route-toggle">Routes</button>
+					<button id="user-options">Options</button>
+				</div>
+				<div id="options-menu" class="hide">
+					<button id="export-page">Export Map</button>
+					<button id="profile-settings">Profile</button>
+					<button id="options-close">Back</button>
+				</div>
+				<div id="add-route-menu" class="hide">
+					<button id="new-route-toggle">Menu</button>
+					<button>Undo</button>
+					<button id="cancel-add-route">Cancel</button>
+				</div>
+			</nav>
+		</div>
+		
+		<main>
+
+			<div id="map"></div>
+			<!-- <script>
+				mapboxgl.accessToken = 'pk.eyJ1Ijoiam9zaWFoLW1hcHMiLCJhIjoiY21sZ3U4djQ0MDJlYzNsb2dtNTBuZGE5MyJ9.Iv0kCNtiadm1dKpLtRTmtQ';
+				const map = new mapboxgl.Map({
+					container: 'map', // container ID
+					center: [-98.58, 39.83], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+					zoom: 4 // starting zoom
+				});
+			</script> -->
+
+			<button id="add" class="show">Add Route</button>
+
+			<div id="route-drawer" class="closed">
+				<div id="route-drawer-menu">
+					<button>Save</button>
+					<button id="route-cancel">Cancel</button>
+				</div>
+				<div id="route-container">
+					{% for route in user_routes%}
+						{% include 'explorastory_app/snippets/routedata.html'%}
+					{% endfor %}
+				</div>
+			</div>
+
+			<div id="new-route-drawer" class="closed">
+				<div id="new-route-drawer-menu">
+					<button id="close-new-route">Close</button>
+				</div>
+				<div id="new-route-container">
+					<p>Route Name</p>
+					<p>Route Date</p>
+					<p>Route Color</p>
+					<p>Notes</p>
+					<p>Guest List</p>
+				</div>
+			</div>
+
+			<div id="profile-drawer" class="closed">
+				<div id="profile-drawer-menu">
+					<button>Logout</button>
+					<button>Change Username</button>
+					<button>Change Password</button>
+					<button>Delete Profile</button>
+					<button id="close-profile">Close</button>
+				</div>
+			</div>
+
+		</main>
+		
+		<footer>
+			<p>&copy; Copyright 2026. All Rights Reserved.</p>
+		</footer>
+		
+		
+	</body>
+</html>

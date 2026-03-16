@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<!--
+	Josiah Keene
+	login.html
+	3/3/26
+-->
+<html lang="en">
+	<head>
+		<title>ExploraStory Login</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="{% static 'explorastory_app/css/styles.css' %}">
+	</head>
+
+    <body>
+        <header></header>
+        <nav></nav>
+        <main>
+            <div id="profile-decor">
+                <img src="{% static 'explorastory_app/images/logo.png' %}" alt="explorastory logo" class="large-logo">
+                <h1>ExploraStory</h1>
+            </div>
+            <div id="profile-form">
+                <h1>Log In</h1>
+
+                {% if form.errors %}
+                    <p>Your username and password didn't match. Please try again.</p>
+                {% endif %}
+
+                {% if next %}
+                    {% if user.is_authenticated %}
+                        <p>Your account doesn't have access to this page. To proceed, please login with an account that has access.</p>
+                    {% else %}
+                        <p>Please login to see this page.</p>
+                    {% endif %}
+                {% endif %}
+
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div>
+                        <div>
+                            <p>{{ form.username.label_tag }}</p>
+                            <p>{{ form.username }}</p>
+                        </div>
+                        <div>
+                            <p>{{ form.password.label_tag }}</p>
+                            <p>{{ form.password }}</p>
+                        </div>
+                    </div>
+
+                    <input type="submit" value="login">
+                </form>
+
+                {# Assumes you set up the password_reset view in your URLconf #}
+                <p><a href="{% url 'explorastory/password_reset' %}">Lost password?</a></p>
+            </div>
+        </main>
+        <footer>
+            <p>&copy; Copyright 2026. All Rights Reserved.</p>
+        </footer>
+    </body>
+</html>

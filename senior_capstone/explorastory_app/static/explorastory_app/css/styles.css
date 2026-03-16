@@ -1,0 +1,252 @@
+/*
+	Josiah Keene
+	styles.css
+	2/9/26
+*/
+
+/* CSS reset */
+body, header, nav, main, footer, img, h1, h2, ul, li{
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+/* Styles for Mobile */
+.logo {
+	width: 50px;
+}
+
+#banner {
+	height: 110px;
+	display: grid;
+	grid-template-columns: auto;
+	margin: auto;
+}
+
+header {
+	display: grid;
+	grid-template-columns: 50px auto;
+}
+
+nav {
+	justify-content: center;
+	height: 54px;
+	display: grid;
+	grid-template-columns: auto;
+}
+
+#default-menu.show {
+	display: grid;
+	grid-template-columns: auto auto;
+}
+
+#options-menu.show {
+	display: grid;
+	grid-template-columns: auto auto auto auto;
+}
+
+#add-route-menu.show {
+	display: grid;
+	grid-template-columns: auto auto auto;
+}
+
+.hide {
+	display: none;
+}
+
+nav button {
+	color:#234d69;
+	border-color: #234d69;
+	border-radius: 5px;
+	height: 45px;
+	width: 75px;
+	margin: 0.5em;
+}
+
+button:hover {
+	background-color: #aaaaaa;
+}
+
+input {
+	color: #234d69;
+	border-color: #234d69;
+}
+
+body {
+    background-color: #9999ff;
+	color: #234d69;
+}
+
+body button {
+	color: #234d69;
+	border-color: #234d69;
+}
+
+main {
+	position: relative;
+}
+
+#add.show {
+	display: block;
+	position: absolute;
+	bottom: 75px;
+	right: calc(50% - 30px);
+	height: 60px;
+	width: 60px;
+	border-radius: 50%;
+}
+
+.closed {
+	display: none;
+}
+
+#route-drawer.open {
+	position: absolute;
+	background-color: #9999ff;
+	border-radius: 10px;
+	top: 25px;
+	right: calc(50% - 150px);
+	width: 300px;
+	height: 90%
+}
+
+#route-drawer-menu {
+	display: grid;
+	grid-template-columns: auto auto;
+	justify-self: right;
+	gap: 0.5em;
+	margin: 0.25em 0.5em 0.25em 0;
+}
+
+#route-container {
+	display: grid;
+	grid-template-columns: auto;
+	grid-auto-rows: min-content;
+	overflow-y: auto;
+	height: calc(100% - 2.5em);
+	background-color: #fff;
+}
+
+#route-data {
+	border: 2px solid #000;
+	border-radius: 5px;
+	background-color: #fff;
+	width: 95%;
+	height: 75px;
+	margin: 0.2em auto;
+}
+
+#new-route-drawer.open {
+	position: absolute;
+	background-color: #9999ff;
+	border-radius: 10px;
+	top: 25px;
+	right: calc(50% - 150px);
+	width: 300px;
+	height: 90%
+}
+
+#new-route-drawer-menu {
+	display: grid;
+	grid-template-columns: auto;
+	justify-self: right;
+	margin: 0.25em 0.5em 0.25em 0.5em;
+}
+
+#new-route-container {
+	display: grid;
+	grid-template-columns: auto;
+	grid-auto-rows: min-content;
+	height: calc(100% - 2.5em);
+	background-color: #fff;
+}
+
+#profile-drawer.open {
+	position: absolute;
+	background-color: #9999ff;
+	border-radius: 10px;
+	top: 25px;
+	right: calc(50% - 150px);
+	width: 300px;
+	height: 90%
+}
+
+#profile-drawer-menu {
+	display: grid;
+	grid-template-columns: auto;
+	gap: 0.5em;
+	margin: 0.25em 0.5em 0.25em 0.5em;
+}
+
+#profile-decor {
+	display: grid;
+	grid-template-columns: auto;
+	justify-content: center;
+	text-align: center;
+}
+
+#profile-decor h1 {
+	font-size: 4em;
+}
+
+#profile-decor img {
+	display: block;
+	width: 60%;
+	margin: auto;
+}
+
+#profile-form {
+	display: grid;
+	grid-template-columns: auto;
+	justify-content: center;
+	text-align: center;
+}
+
+#map {
+	height: calc(100vh - 130px);
+	width: 100%;
+}
+
+footer p {
+	text-align: center;
+	font-size: 0.75em;
+	margin-top: 0.5em;
+	margin-bottom: 0;
+}
+
+@media screen and (min-width: 500px), print {
+	
+	#banner {
+		height: 55px;
+		display: grid;
+		grid-template-columns: 20% auto;
+		margin: 0 2%;
+	}
+
+	nav {
+		justify-self: right;
+		height: 50px;
+	}
+
+	#route-drawer.open {
+		right: 25px;
+	}
+
+	#new-route-drawer.open {
+		right: 25px;
+	}
+
+	#options-menu.show {
+		display: grid;
+		grid-template-columns: auto auto auto;
+	}
+	
+	#add.show {
+		right: 75px;
+	}
+
+	#map {
+	height: calc(100vh - 85px);
+	width: 100%;
+}
+}

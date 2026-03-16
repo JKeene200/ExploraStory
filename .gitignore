@@ -205,3 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# Secret Password file
+secret_password.py
+
+# Environment setup file
+django_env.yml
