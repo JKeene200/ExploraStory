@@ -13,7 +13,12 @@ body, header, nav, main, footer, img, h1, h2, ul, li{
 
 /* Styles for Mobile */
 .logo {
-	width: 50px;
+	width: 45px;
+	padding: 4.5px;
+}
+
+.user-display {
+	padding-left: 1em;
 }
 
 #banner {
@@ -37,12 +42,12 @@ nav {
 
 #default-menu.show {
 	display: grid;
-	grid-template-columns: auto auto;
+	grid-template-columns: auto auto auto;
 }
 
 #options-menu.show {
 	display: grid;
-	grid-template-columns: auto auto auto auto;
+	grid-template-columns: auto auto auto;
 }
 
 #add-route-menu.show {
@@ -86,7 +91,7 @@ main {
 	position: relative;
 }
 
-#add.show {
+.center-btn.show {
 	display: block;
 	position: absolute;
 	bottom: 75px;
@@ -127,6 +132,10 @@ main {
 	background-color: #fff;
 }
 
+#route-container p {
+	margin: 0.5em;
+}
+
 #route-data {
 	border: 2px solid #000;
 	border-radius: 5px;
@@ -136,6 +145,33 @@ main {
 	margin: 0.2em auto;
 }
 
+#new-route-instructions.show {
+	position: absolute;
+	background-color: #9999ff;
+	border-radius: 10px;
+	top: 25px;
+	right: 5%;
+	width: 90%;
+}
+
+#new-route-instructions p{
+	padding: 0 1em;
+	margin: 5px 0 10px 0;
+}
+
+#new-route-instructions h1 {
+	font-size: large;
+	padding: 0 1em;
+	margin: 0;
+}
+
+#route-instructions-header {
+	display: grid;
+	grid-template-columns: auto auto;
+	justify-content: space-between;
+	margin: 0.25em 0.5em 0.25em 0.5em;
+}
+
 #new-route-drawer.open {
 	position: absolute;
 	background-color: #9999ff;
@@ -143,12 +179,13 @@ main {
 	top: 25px;
 	right: calc(50% - 150px);
 	width: 300px;
-	height: 90%
+	height: 90%;
 }
 
 #new-route-drawer-menu {
 	display: grid;
-	grid-template-columns: auto;
+	grid-template-columns: auto auto;
+	gap: 0.5em;
 	justify-self: right;
 	margin: 0.25em 0.5em 0.25em 0.5em;
 }
@@ -228,6 +265,11 @@ footer p {
 		height: 50px;
 	}
 
+	#new-route-instructions.show {
+		width: 60%;
+		right: 20%;
+	}
+
 	#route-drawer.open {
 		right: 25px;
 	}
@@ -241,7 +283,7 @@ footer p {
 		grid-template-columns: auto auto auto;
 	}
 	
-	#add.show {
+	.center-btn.show {
 		right: 75px;
 	}
 

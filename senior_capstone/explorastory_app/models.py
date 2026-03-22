@@ -28,5 +28,5 @@ class Passenger(models.Model):
 
     # returns a string about the object
     def __str__():
-        return ('{self.route_name}')
+        return ('{self.passenger_name}')
     

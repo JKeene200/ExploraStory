@@ -9,10 +9,13 @@
 	<head>
 		<title>ExploraStory</title>
 		<meta charset="utf-8">
+		<link rel="icon" type="image/png" href="{% static 'explorastory_app/images/favicon.png' %}">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="{% static 'explorastory_app/css/styles.css' %}">
 		<link href="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.css" rel="stylesheet">
-		<!-- <script src="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.js"></script> -->
+		<script src="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.js"></script>
+		<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.5.1/mapbox-gl-draw.js"></script>
+		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.5.1/mapbox-gl-draw.css" type="text/css">
 		<script defer src="{% static 'explorastory_app/js/index.js' %}"></script>
 	</head>
 
@@ -20,13 +23,17 @@
 		<div id="banner">
 			<header>
 				<img src="{% static 'explorastory_app/images/logo.png' %}" alt="explorastory logo" class="logo">
-				<p class="user-display">Username</p>
+				<p class="user-display">{{username}}</p>
 			</header>
 
 			<nav>
 				<div id="default-menu" class="show">
 					<button id="route-toggle">Routes</button>
 					<button id="user-options">Options</button>
+					<form action="{% url 'logout' %}" method="post">
+						{% csrf_token %}
+						<button type="submit">Log Out</button>
+					</form>
 				</div>
 				<div id="options-menu" class="hide">
 					<button id="export-page">Export Map</button>
@@ -35,7 +42,7 @@
 				</div>
 				<div id="add-route-menu" class="hide">
 					<button id="new-route-toggle">Menu</button>
-					<button>Undo</button>
+					<button id="reset-route-trace">Reset Route</button>
 					<button id="cancel-add-route">Cancel</button>
 				</div>
 			</nav>
@@ -44,16 +51,8 @@
 		<main>
 
 			<div id="map"></div>
-			<!-- <script>
-				mapboxgl.accessToken = 'pk.eyJ1Ijoiam9zaWFoLW1hcHMiLCJhIjoiY21sZ3U4djQ0MDJlYzNsb2dtNTBuZGE5MyJ9.Iv0kCNtiadm1dKpLtRTmtQ';
-				const map = new mapboxgl.Map({
-					container: 'map', // container ID
-					center: [-98.58, 39.83], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-					zoom: 4 // starting zoom
-				});
-			</script> -->
 
-			<button id="add" class="show">Add Route</button>
+			<button id="add" class="center-btn show">Add Route</button>
 
 			<div id="route-drawer" class="closed">
 				<div id="route-drawer-menu">
@@ -61,15 +60,30 @@
 					<button id="route-cancel">Cancel</button>
 				</div>
 				<div id="route-container">
-					{% for route in user_routes%}
-						{% include 'explorastory_app/snippets/routedata.html'%}
-					{% endfor %}
+					{% if user_routes|length == 0%}
+						<p>You have no routes. Once you add a route, it will appear here.</p>
+					{% else %}
+						{% for route in user_routes%}
+							{% include 'explorastory_app/snippets/routedata.html'%}
+						{% endfor %}
+					{% endif %}
 				</div>
 			</div>
 
+			<div id="new-route-instructions" class="hide">
+				<div id="route-instructions-header">
+					<h1>Directions:</h1>
+					<button id="instructions-close">&times;</button>
+				</div>
+				<p>Add points to your route by selecting where on the map you want the route to change directions. To end the route, select the last point you placed. You can adjust the location of points and add new points in the middle of your route after ending the route by double clicking on it.</p>
+			</div>
+
+			<button id="route-next-step" class="center-btn hide">Next</button>
+
 			<div id="new-route-drawer" class="closed">
 				<div id="new-route-drawer-menu">
-					<button id="close-new-route">Close</button>
+					<button id="save-new-route">Finish and Save</button>
+					<button id="close-new-route">Cancel</button>
 				</div>
 				<div id="new-route-container">
 					<p>Route Name</p>
@@ -79,10 +93,10 @@
 					<p>Guest List</p>
 				</div>
 			</div>
+			
 
 			<div id="profile-drawer" class="closed">
 				<div id="profile-drawer-menu">
-					<button>Logout</button>
 					<button>Change Username</button>
 					<button>Change Password</button>
 					<button>Delete Profile</button>
