@@ -13,12 +13,14 @@ body, header, nav, main, footer, img, h1, h2, ul, li{
 
 /* Styles for Mobile */
 .logo {
-	width: 45px;
+	height: 45px;
 	padding: 4.5px;
 }
 
 .user-display {
 	padding-left: 1em;
+	font-size: 1.5em;
+	margin: 0.6em 0;
 }
 
 #banner {
@@ -60,8 +62,8 @@ nav {
 }
 
 nav button {
-	color:#234d69;
-	border-color: #234d69;
+	color:#2b4162;
+	border-color: #2b4162;
 	border-radius: 5px;
 	height: 45px;
 	width: 75px;
@@ -73,18 +75,18 @@ button:hover {
 }
 
 input {
-	color: #234d69;
-	border-color: #234d69;
+	color: #2b4162;
+	border-color: #2b4162;
 }
 
 body {
     background-color: #9999ff;
-	color: #234d69;
+	color: #2b4162;
 }
 
 body button {
-	color: #234d69;
-	border-color: #234d69;
+	color: #2b4162;
+	border-color: #2b4162;
 }
 
 main {
@@ -101,11 +103,7 @@ main {
 	border-radius: 50%;
 }
 
-.closed {
-	display: none;
-}
-
-#route-drawer.open {
+#route-drawer.show {
 	position: absolute;
 	background-color: #9999ff;
 	border-radius: 10px;
@@ -172,7 +170,7 @@ main {
 	margin: 0.25em 0.5em 0.25em 0.5em;
 }
 
-#new-route-drawer.open {
+#new-route-drawer.show {
 	position: absolute;
 	background-color: #9999ff;
 	border-radius: 10px;
@@ -184,7 +182,7 @@ main {
 
 #new-route-drawer-menu {
 	display: grid;
-	grid-template-columns: auto auto;
+	grid-template-columns: auto;
 	gap: 0.5em;
 	justify-self: right;
 	margin: 0.25em 0.5em 0.25em 0.5em;
@@ -198,7 +196,18 @@ main {
 	background-color: #fff;
 }
 
-#profile-drawer.open {
+#new-route-container form div{
+	display: grid;
+	grid-template-columns: auto;
+	padding: 0 0.25em;
+}
+
+#save-form {
+	display: block;
+	margin: 0.5em auto 0 auto;
+}
+
+#profile-drawer.show {
 	position: absolute;
 	background-color: #9999ff;
 	border-radius: 10px;
@@ -223,12 +232,12 @@ main {
 }
 
 #profile-decor h1 {
-	font-size: 4em;
+	font-size: 3em;
 }
 
 #profile-decor img {
 	display: block;
-	width: 60%;
+	width: 20%;
 	margin: auto;
 }
 
@@ -270,11 +279,11 @@ footer p {
 		right: 20%;
 	}
 
-	#route-drawer.open {
+	#route-drawer.show {
 		right: 25px;
 	}
 
-	#new-route-drawer.open {
+	#new-route-drawer.show {
 		right: 25px;
 	}
 

@@ -18,6 +18,19 @@ const draw = new MapboxDraw({
     defaultMode: 'draw_line_string'
 });
 
+/*  */
+function toggleHideElements(itemArray) {
+    for (const item of itemArray) {
+        if (item.classList.contains('show')) {
+            item.classList.remove('show')
+            item.classList.add('hide')
+        } else {
+            item.classList.remove('hide')
+            item.classList.add('show')
+        }
+    }
+}
+
 /* listener open options menu */
 const optionsOpenButton = document.getElementById('user-options');
 optionsOpenButton.addEventListener('click',toggleOptionsMenu);
@@ -37,27 +50,16 @@ function toggleOptionsMenu() {
     /* switch between the default menu and the options menu as appropriate, hiding the add button while showing the options menu */
     if (defaultMenu.classList.contains('show')) {
         /* close route drawer if it is open */
-        if (routeDrawer.classList.contains('open')) {
+        if (routeDrawer.classList.contains('show')) {
             toggleRouteDrawer();
         }
-        defaultMenu.classList.remove('show');
-        defaultMenu.classList.add('hide');
-        optionsMenu.classList.remove('hide');
-        optionsMenu.classList.add('show');
-        addButton.classList.remove('show');
-        addButton.classList.add('hide');
+        toggleHideElements([defaultMenu, optionsMenu, addButton]);
     } else {
         /* close profile drawer if it is open */
-        if (profileDrawer.classList.contains('open')) {
+        if (profileDrawer.classList.contains('show')) {
             toggleProfileDrawer();
         }
-        optionsMenu.classList.remove('show');
-        optionsMenu.classList.add('hide');
-        defaultMenu.classList.remove('hide');
-        defaultMenu.classList.add('show');
-        addButton.classList.remove('hide');
-        addButton.classList.add('show');
-
+        toggleHideElements([optionsMenu, defaultMenu, addButton]);
     };
 };
 
@@ -75,18 +77,7 @@ function toggleRouteDrawer() {
     const addButton = document.getElementById('add');
     
     /* open or close the route drawer as appropriate, hiding the add button while the drawer is open */
-    if (drawer.classList.contains('closed')) {
-        drawer.classList.remove('closed');
-        drawer.classList.add('open');
-        addButton.classList.remove('show');
-        addButton.classList.add('hide');
-    } else {
-        drawer.classList.remove('open');
-        drawer.classList.add('closed');
-        addButton.classList.remove('hide');
-        addButton.classList.add('show');
-    };
-    
+    toggleHideElements([drawer, addButton]);
 };
 
 /* listener toggle profile drawer button */
@@ -102,14 +93,7 @@ function toggleProfileDrawer() {
     const drawer = document.getElementById('profile-drawer');
     
     /* open or close the profile drawer as appropriate */
-    if (drawer.classList.contains('closed')) {
-        drawer.classList.remove('closed');
-        drawer.classList.add('open');
-    } else {
-        drawer.classList.remove('open');
-        drawer.classList.add('closed');
-    };
-    
+    toggleHideElements([drawer]);
 };
 
 /* listener add route button */
@@ -121,30 +105,38 @@ const cancelAddRouteButton = document.getElementById('cancel-add-route');
 cancelAddRouteButton.addEventListener('click',tryCloseNewRouteDrawer);
 cancelAddRouteButton.addEventListener('click',toggleAddRouteScreen);
 
+/* listener close new route instructions box button */
+const closeNewRouteInstructions = document.getElementById('instructions-close');
+closeNewRouteInstructions.addEventListener('click',toggleNewRouteInstructions);
+
 /* add route screen */
 function toggleAddRouteScreen() {
     const addButton = document.getElementById('add');
     const routeMenu = document.getElementById('add-route-menu');
     const defaultMenu = document.getElementById('default-menu');
+    const instructionsBox = document.getElementById('new-route-instructions');
     
     if (addButton.classList.contains('show')) {
-        addButton.classList.remove('show');
-        addButton.classList.add('hide');
-        defaultMenu.classList.remove('show');
-        defaultMenu.classList.add('hide');
-        routeMenu.classList.remove('hide');
-        routeMenu.classList.add('show');
+        toggleHideElements([addButton, defaultMenu, routeMenu]);
+        toggleNewRouteInstructions();
         map.addControl(draw);
     } else {
-        routeMenu.classList.remove('show');
-        routeMenu.classList.add('hide');
-        defaultMenu.classList.remove('hide');
-        defaultMenu.classList.add('show');
-        addButton.classList.remove('hide');
-        addButton.classList.add('show');
+        /* if instructions box is open, close it */
+        if (instructionsBox.classList.contains('show')) {
+            toggleNewRouteInstructions();
+        };
+        toggleHideElements([routeMenu, defaultMenu, addButton]);
         map.removeControl(draw);
     };
 };
+
+/* toggle new route instructions */
+function toggleNewRouteInstructions() {
+    const instructionsBox = document.getElementById('new-route-instructions');
+
+    /* hide of show the new route instructions as appropriate */
+    toggleHideElements([instructionsBox]);
+}
 
 /* listener toggle new route drawer button */
 const newRouteToggleButton = document.getElementById('new-route-toggle');
@@ -159,13 +151,7 @@ function toggleNewRouteDrawer() {
     const drawer = document.getElementById('new-route-drawer');
     
     /* open or close the new route drawer as appropriate */
-    if (drawer.classList.contains('closed')) {
-        drawer.classList.remove('closed');
-        drawer.classList.add('open');
-    } else {
-        drawer.classList.remove('open');
-        drawer.classList.add('closed');
-    };
+    toggleHideElements([drawer]);
     
 };
 
@@ -174,9 +160,8 @@ function tryCloseNewRouteDrawer() {
     const drawer = document.getElementById('new-route-drawer');
     
     /* close the new route drawer if it is open */
-    if (drawer.classList.contains('open')) {
-        drawer.classList.remove('open');
-        drawer.classList.add('closed');
+    if (drawer.classList.contains('show')) {
+        toggleHideElements([drawer]);
     };
 };
 
@@ -186,56 +171,70 @@ resetRouteTraceButton.addEventListener('click',resetRouteTrace);
 
 /* Reset the trace if a mistake was made */
 function resetRouteTrace() {
-    draw.deleteAll()
-    draw.changeMode('draw_line_string')
+    draw.deleteAll();
+    draw.changeMode('draw_line_string');
 }
 
+/* new route addition logic below */
+map.on('draw.create', updateLine);
+map.on('draw.update', updateLine);
 
-/* map.on('load', () => {
-    map.addSource('route', {
+function updateLine(e) {
+    let data = draw.getAll();
+    let geometry = JSON.stringify(data.features[0].geometry);
+    document.getElementById('id_route_data').value = geometry;
+};
+
+/* route display logic below */
+
+/* parse data from database */
+map.on('load', () => {
+    let myData = JSON.parse(document.getElementById('data-storage').textContent);
+    displayRoutes(myData);
+});
+
+/* add routes to map from json*/
+function displayRoutes(data) {
+    for (let feature of data.features) {
+        addRouteSource(feature);
+        renderRouteLayer(feature);
+    };
+};
+
+/* add route data source to map */
+function addRouteSource(feature) {
+    let route_id = 'route' + String(feature.id)
+    let route_coords = feature.geometry.coordinates
+    map.addSource(route_id, {
         'type': 'geojson',
         'data': {
             'type': 'Feature',
             'properties': {},
             'geometry': {
                 'type': 'LineString',
-                'coordinates': [
-                    [-122.483696, 37.833818],
-                    [-122.483482, 37.833174],
-                    [-122.483396, 37.8327],
-                    [-122.483568, 37.832056],
-                    [-122.48404, 37.831141],
-                    [-122.48404, 37.830497],
-                    [-122.483482, 37.82992],
-                    [-122.483568, 37.829548],
-                    [-122.48507, 37.829446],
-                    [-122.4861, 37.828802],
-                    [-122.486958, 37.82931],
-                    [-122.487001, 37.830802],
-                    [-122.487516, 37.831683],
-                    [-122.488031, 37.832158],
-                    [-122.488889, 37.832971],
-                    [-122.489876, 37.832632],
-                    [-122.490434, 37.832937],
-                    [-122.49125, 37.832429],
-                    [-122.491636, 37.832564],
-                    [-122.492237, 37.833378],
-                    [-122.493782, 37.833683]
-                ]
+                'coordinates': route_coords
             }
         }
     });
+}
+
+/* render route on map from source */
+function renderRouteLayer(feature) {
+    let route_id = 'route' + String(feature.id)
+    let color = String(feature.properties.route_color)
     map.addLayer({
-        'id': 'route',
+        'id': route_id,
         'type': 'line',
-        'source': 'route',
+        'source': route_id,
         'layout': {
             'line-join': 'round',
             'line-cap': 'round'
         },
         'paint': {
-            'line-color': '#888',
-            'line-width': 8
+            'line-color': color,
+            'line-width': 5
         }
     });
-}); */
+}
+
+

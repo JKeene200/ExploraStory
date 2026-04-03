@@ -17,12 +17,13 @@
 		<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.5.1/mapbox-gl-draw.js"></script>
 		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.5.1/mapbox-gl-draw.css" type="text/css">
 		<script defer src="{% static 'explorastory_app/js/index.js' %}"></script>
+		{{ render_data|json_script:'data-storage' }}
 	</head>
 
 	<body>
 		<div id="banner">
 			<header>
-				<img src="{% static 'explorastory_app/images/logo.png' %}" alt="explorastory logo" class="logo">
+				<img src="{% static 'explorastory_app/images/logo.svg' %}" alt="explorastory logo" class="logo">
 				<p class="user-display">{{username}}</p>
 			</header>
 
@@ -54,7 +55,7 @@
 
 			<button id="add" class="center-btn show">Add Route</button>
 
-			<div id="route-drawer" class="closed">
+			<div id="route-drawer" class="hide">
 				<div id="route-drawer-menu">
 					<button>Save</button>
 					<button id="route-cancel">Cancel</button>
@@ -80,22 +81,21 @@
 
 			<button id="route-next-step" class="center-btn hide">Next</button>
 
-			<div id="new-route-drawer" class="closed">
+			<div id="new-route-drawer" class="hide">
 				<div id="new-route-drawer-menu">
-					<button id="save-new-route">Finish and Save</button>
-					<button id="close-new-route">Cancel</button>
+					<button id="close-new-route">Back</button>
 				</div>
 				<div id="new-route-container">
-					<p>Route Name</p>
-					<p>Route Date</p>
-					<p>Route Color</p>
-					<p>Notes</p>
-					<p>Guest List</p>
+					<form id="new-route-form" method="post" action="{% url 'index' %}">
+						{% csrf_token %}
+						{{ form }}
+						<input id="save-form" type="submit" value="Save">
+               		</form>
 				</div>
 			</div>
 			
 
-			<div id="profile-drawer" class="closed">
+			<div id="profile-drawer" class="hide">
 				<div id="profile-drawer-menu">
 					<button>Change Username</button>
 					<button>Change Password</button>

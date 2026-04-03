@@ -17,8 +17,8 @@ class Route(models.Model):
     route_note = models.TextField()
 
     # returns a string about the object
-    def __str__():
-        return ('%s, traveled on %s by %s' % ({self.route_name}, {self.route_date}, {self.user}))
+    def __str__(self):
+        return ('%s, traveled on %s by %s' % (self.route_name, self.route_date, self.user))
 
 # The Passenger model
 class Passenger(models.Model):
@@ -27,6 +27,6 @@ class Passenger(models.Model):
     passenger_name = models.CharField(max_length=50)
 
     # returns a string about the object
-    def __str__():
-        return ('{self.passenger_name}')
+    def __str__(self):
+        return (self.passenger_name)
     
