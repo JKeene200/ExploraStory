@@ -1,11 +1,18 @@
-<div id="route-data">
-    <div id="route-number">
-        <p>Route: {{route.route_layer}}</p>
+{% load static %}
+<li route-id="{{route.route_id}}" id="route-data" draggable="true" route-layer="{{route.route_layer}}">
+    <div id="route-grip">
+        <p>|||</p>
     </div>
-    <div id="route-name">
-        <p>Title: {{route.route_name}}</p>
+    <div id="route-color-display" style="color: {{route.route_color}}; background-color: {{route.route_color}}">
+        <p >---</p>
     </div>
-    <div id="route-date">
-        <p>Date: {{route.route_date}}</p>
+    <div id="route-text">
+        <div id="route-name">
+            <p>{{route.route_name}}</p>
+        </div>
+        <div id="route-date">
+            <p>{{route.route_date}}</p>
+        </div>
+        <button id="{{route.route_id}}" class="route-details">Details</button>
     </div>
-</div>
+</li>

@@ -18,7 +18,7 @@ const draw = new MapboxDraw({
     defaultMode: 'draw_line_string'
 });
 
-/*  */
+/* function to hide and show elements as needed, accepts a list of elements */
 function toggleHideElements(itemArray) {
     for (const item of itemArray) {
         if (item.classList.contains('show')) {
@@ -30,6 +30,9 @@ function toggleHideElements(itemArray) {
         }
     }
 }
+
+/* drag event listeners */
+document.addEventListener('DOMContentLoaded', dragListener);
 
 /* listener open options menu */
 const optionsOpenButton = document.getElementById('user-options');
@@ -78,6 +81,8 @@ function toggleRouteDrawer() {
     
     /* open or close the route drawer as appropriate, hiding the add button while the drawer is open */
     toggleHideElements([drawer, addButton]);
+    /* close modify route menu if it is open, logic is in the called function */
+    closeModifyRoute();
 };
 
 /* listener toggle profile drawer button */
@@ -106,7 +111,7 @@ cancelAddRouteButton.addEventListener('click',tryCloseNewRouteDrawer);
 cancelAddRouteButton.addEventListener('click',toggleAddRouteScreen);
 
 /* listener close new route instructions box button */
-const closeNewRouteInstructions = document.getElementById('instructions-close');
+const closeNewRouteInstructions = document.getElementById('instructions-popup-close');
 closeNewRouteInstructions.addEventListener('click',toggleNewRouteInstructions);
 
 /* add route screen */
@@ -149,8 +154,12 @@ newRouteCloseButton.addEventListener('click',toggleNewRouteDrawer);
 /* toggle new route drawer */
 function toggleNewRouteDrawer() {
     const drawer = document.getElementById('new-route-drawer');
+    const instructionsBox = document.getElementById('new-route-instructions');
     
-    /* open or close the new route drawer as appropriate */
+    /* open or close the new route drawer as appropriate, hide new route instructions if needed*/
+    if (instructionsBox.classList.contains('show')) {
+        toggleHideElements([instructionsBox]);
+    };
     toggleHideElements([drawer]);
     
 };
@@ -165,9 +174,128 @@ function tryCloseNewRouteDrawer() {
     };
 };
 
+/* route reorder code below */
+function dragListener() {
+    const routeContainer = document.getElementById('route-container');
+    const routes = routeContainer.querySelectorAll('li');
+    let routeStart, routeNew, route1, route2;
+
+    for (li of routes) {
+        li.ondragstart = function(){
+            route1 = this;
+        };
+
+        li.ondragover = (e) => e.preventDefault();
+        
+        li.ondrop = function(){
+            route2 = this;
+            swapRoutes(route1, route2);
+        };
+    }
+};
+
+/* swap routes in list */
+function swapRoutes(route1, route2) {
+    const parent = route1.parentNode;
+    const nextRoute = route2.nextSibling;
+
+    /* If route2 is right after route1, use adjacent logic */
+    if (nextRoute === route1) {
+        parent.insertBefore(route1, route2);
+    } else {
+        /* Replace route1 with route2 */
+        route1.replaceWith(route2);
+        
+        /* Insert route1 back into route2's original position */
+        if (nextRoute) {
+            parent.insertBefore(route1, nextRoute);
+        } else { /* if nextRoute does not exist */
+            parent.appendChild(route1);
+        };
+    };
+};
+
+/* listener for save route order button */
+const saveOrderButton = document.getElementById('save-order');
+saveOrderButton.addEventListener('click', saveRouteOrder);
+
+/* update route order */
+function updateRouteOrder() {
+    const routeContainer = document.getElementById('route-container');
+    const routes = routeContainer.querySelectorAll('li');
+
+    /* ensure route order is numerical */
+    let incrementer = 1;
+    for (li of routes) {
+        li.setAttribute('route-layer', incrementer);
+        incrementer += 1;
+    };
+};
+
+/* Save new route order */
+function saveRouteOrder() {
+    updateRouteOrder();
+};
+
+/* listener for modify route buttons */
+const modifyButtonContainer = document.getElementById('route-container');
+modifyButtonContainer.addEventListener('click', openModifyRoute);
+
+/* listener for close modify route button*/
+const closeModifyRouteButton = document.getElementById('close-route-details');
+closeModifyRouteButton.addEventListener('click', closeModifyRoute);
+
+/* open the modify route drawer and populate the form with the appropriate data */
+function openModifyRoute(e) {
+    const modifyDrawer = document.getElementById('route-details-drawer');
+    /* if called by route-details button, populate form */
+    if (e.target.classList.contains('route-details')) {
+        let routeId = e.target.id;
+        let myData = JSON.parse(document.getElementById('data-storage').textContent);
+        let route = myData.features.find(f => f.id == routeId);
+
+        /* populate form with appropriate data */
+        document.getElementById('id_route_id').value = routeId;
+        document.getElementById('id_change_route_name').value = route.properties.route_name;
+        document.getElementById('id_change_route_date').value = route.properties.route_date;
+        document.getElementById('id_change_route_color').value = route.properties.route_color;
+        document.getElementById('id_change_route_note').value = route.properties.route_note;
+
+        /* also poulate delete form, in case it is needed */
+        document.getElementById('delete_route_id').value = routeId;
+        toggleHideElements([modifyDrawer]);
+    };
+};
+
+function closeModifyRoute() {
+    const modifyDrawer = document.getElementById('route-details-drawer');
+    /* close drawer if open */
+    if (modifyDrawer.classList.contains('show')) {
+        toggleHideElements([modifyDrawer])
+    }
+}
+
+/* listener for delete route button */
+const deleteRouteButton = document.getElementById('delete-route');
+deleteRouteButton.addEventListener('click', toggleDeleteRoutePopup);
+
+/* listener for cancel delete route button */
+const cancelDeleteRouteButton = document.getElementById('cancel-delete');
+cancelDeleteRouteButton.addEventListener('click', toggleDeleteRoutePopup);
+
+/* listener for close delete route button */
+const closeDeleteRouteButton = document.getElementById('delete-popup-close');
+closeDeleteRouteButton.addEventListener('click', toggleDeleteRoutePopup);
+
+/* open the delete route menu */
+function toggleDeleteRoutePopup() {
+    const popup = document.getElementById('delete-route-popup');
+    toggleHideElements([popup]);
+}
+
 /* listener reset route trace button */
 const resetRouteTraceButton = document.getElementById('reset-route-trace');
-resetRouteTraceButton.addEventListener('click',resetRouteTrace);
+resetRouteTraceButton.addEventListener('click', resetRouteTrace);
 
 /* Reset the trace if a mistake was made */
 function resetRouteTrace() {
@@ -176,9 +304,11 @@ function resetRouteTrace() {
 }
 
 /* new route addition logic below */
+/* call function to update the route form as needed */
 map.on('draw.create', updateLine);
 map.on('draw.update', updateLine);
 
+/* update the trace coordinates in the form */
 function updateLine(e) {
     let data = draw.getAll();
     let geometry = JSON.stringify(data.features[0].geometry);
@@ -203,8 +333,8 @@ function displayRoutes(data) {
 
 /* add route data source to map */
 function addRouteSource(feature) {
-    let route_id = 'route' + String(feature.id)
-    let route_coords = feature.geometry.coordinates
+    let route_id = 'route' + String(feature.id);
+    let route_coords = feature.geometry.coordinates;
     map.addSource(route_id, {
         'type': 'geojson',
         'data': {
@@ -220,8 +350,8 @@ function addRouteSource(feature) {
 
 /* render route on map from source */
 function renderRouteLayer(feature) {
-    let route_id = 'route' + String(feature.id)
-    let color = String(feature.properties.route_color)
+    let route_id = 'route' + String(feature.id);
+    let color = String(feature.properties.route_color);
     map.addLayer({
         'id': route_id,
         'type': 'line',

@@ -128,19 +128,37 @@ main {
 	overflow-y: auto;
 	height: calc(100% - 2.5em);
 	background-color: #fff;
+	list-style: none;
 }
 
-#route-container p {
+#route-container p  {
 	margin: 0.5em;
 }
 
+#route-container button {
+	margin: 0.5em;
+	width: 90%;
+}
+
 #route-data {
+	display: grid;
+	grid-template-columns: 1fr 1fr 6fr;
 	border: 2px solid #000;
 	border-radius: 5px;
 	background-color: #fff;
 	width: 95%;
-	height: 75px;
 	margin: 0.2em auto;
+}
+
+#route-grip {
+	text-align: center;
+	margin: auto;
+}
+
+#route-color-display {
+	text-align: center;
+	margin: auto;
+	border-radius: 50%;
 }
 
 #new-route-instructions.show {
@@ -163,7 +181,7 @@ main {
 	margin: 0;
 }
 
-#route-instructions-header {
+#popup-header {
 	display: grid;
 	grid-template-columns: auto auto;
 	justify-content: space-between;
@@ -194,12 +212,101 @@ main {
 	grid-auto-rows: min-content;
 	height: calc(100% - 2.5em);
 	background-color: #fff;
+	overflow-y: auto;
 }
 
 #new-route-container form div{
 	display: grid;
 	grid-template-columns: auto;
 	padding: 0 0.25em;
+}
+
+#route-details-drawer.show {
+	position: absolute;
+	background-color: #9999ff;
+	border-radius: 10px;
+	top: 25px;
+	right: calc(50% - 150px);
+	width: 300px;
+	height: 90%;
+}
+
+#route-details-drawer-menu {
+	display: grid;
+	grid-template-columns: auto auto;
+	gap: 0.5em;
+	justify-content: space-between;
+	margin: 0.25em 0.5em 0.25em 0.5em;
+}
+
+#route-details-drawer-menu p {
+	margin: 0;
+}
+
+#route-details-container {
+	display: grid;
+	grid-template-columns: auto;
+	grid-auto-rows: min-content;
+	height: calc(100% - 2.5em);
+	background-color: #fff;
+	overflow-y: auto;
+}
+
+#route-details-container form div{
+	display: grid;
+	grid-template-columns: auto;
+	padding: 0 0.25em;
+}
+
+#floating {
+	color: #9999ff;
+}
+
+#id_route_color, #id_change_route_color {
+	width: 100%;
+	height: 35px;
+}
+
+#delete-route {
+	display: block;
+	margin: 0.5em auto 0 auto;
+}
+
+#delete-route-popup.show {
+	position: absolute;
+	background-color: #9999ff;
+	border-radius: 10px;
+	top: 200px;
+	right: calc(50% - 150px);
+	width: 300px;
+}
+
+#delete-route-content {
+	background-color: #fff;
+}
+
+#delete-route-popup p{
+	padding: 0 1em;
+	margin: 5px 0 10px 0;
+}
+
+#delete-route-popup h1 {
+	font-size: large;
+	padding: 0 1em;
+	margin: 0;
+}
+
+#delete-menu {
+	display: grid;
+	grid-template-columns: auto auto;
+	padding: 0.25em 0.5em 0.5em 0.5em;
+	gap: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+#cancel-delete {
+	display: block;
+	margin: 0.5em auto 0 auto;
 }
 
 #save-form {
@@ -284,6 +391,10 @@ footer p {
 	}
 
 	#new-route-drawer.show {
+		right: 25px;
+	}
+
+	#route-details-drawer.show {
 		right: 25px;
 	}
 

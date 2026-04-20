@@ -57,10 +57,10 @@
 
 			<div id="route-drawer" class="hide">
 				<div id="route-drawer-menu">
-					<button>Save</button>
+					<button id="save-order">Save</button>
 					<button id="route-cancel">Cancel</button>
 				</div>
-				<div id="route-container">
+				<ul id="route-container">
 					{% if user_routes|length == 0%}
 						<p>You have no routes. Once you add a route, it will appear here.</p>
 					{% else %}
@@ -68,13 +68,13 @@
 							{% include 'explorastory_app/snippets/routedata.html'%}
 						{% endfor %}
 					{% endif %}
-				</div>
+				</ul>
 			</div>
 
 			<div id="new-route-instructions" class="hide">
-				<div id="route-instructions-header">
+				<div id="popup-header">
 					<h1>Directions:</h1>
-					<button id="instructions-close">&times;</button>
+					<button id="instructions-popup-close">&times;</button>
 				</div>
 				<p>Add points to your route by selecting where on the map you want the route to change directions. To end the route, select the last point you placed. You can adjust the location of points and add new points in the middle of your route after ending the route by double clicking on it.</p>
 			</div>
@@ -88,9 +88,42 @@
 				<div id="new-route-container">
 					<form id="new-route-form" method="post" action="{% url 'index' %}">
 						{% csrf_token %}
-						{{ form }}
-						<input id="save-form" type="submit" value="Save">
+						{{ form_new }}
+						<input id="save-form" type="submit" name="submit-new-route" value="Save">
                		</form>
+				</div>
+			</div>
+
+			<div id="route-details-drawer" class="hide">
+				<div id="route-details-drawer-menu">
+					<p>Route Details</p>
+					<button id="close-route-details">Exit</button>
+				</div>
+				<div id="route-details-container">
+					<form id="modify-route-form" method="post" action="{% url 'index' %}">
+						{% csrf_token %}
+						{{ modify_form }}
+						<input id="save-form" type="submit" name="submit-route-modification" value="Save Changes">
+               		</form>
+					<button id="delete-route">Delete Route</button>
+				</div>
+			</div>
+
+			<div id="delete-route-popup" class="hide">
+				<div id="popup-header">
+					<h1>Delete Route:</h1>
+					<button id="delete-popup-close">&times;</button>
+				</div>
+				<div id="delete-route-content">
+					<p>Are you sure you want to permanently delete this route?</p>
+					<div id="delete-menu">
+						<form id="delete-route-form" method="post" action="{% url 'index' %}">
+							{% csrf_token %}
+							{{ delete_form }}
+							<input id="save-form" type="submit" name="submit-route-delete" value="Delete">
+               			</form>
+						<button id="cancel-delete">Cancel</button>
+					</div>
 				</div>
 			</div>
 			
