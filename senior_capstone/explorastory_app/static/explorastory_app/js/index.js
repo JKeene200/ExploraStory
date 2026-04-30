@@ -108,6 +108,7 @@ addRouteButton.addEventListener('click',toggleAddRouteScreen);
 /* listener add route button */
 const cancelAddRouteButton = document.getElementById('cancel-add-route');
 cancelAddRouteButton.addEventListener('click',tryCloseNewRouteDrawer);
+cancelAddRouteButton.addEventListener('click',hideNextButton);
 cancelAddRouteButton.addEventListener('click',toggleAddRouteScreen);
 
 /* listener close new route instructions box button */
@@ -144,8 +145,21 @@ function toggleNewRouteInstructions() {
 }
 
 /* listener toggle new route drawer button */
-const newRouteToggleButton = document.getElementById('new-route-toggle');
-newRouteToggleButton.addEventListener('click',toggleNewRouteDrawer);
+const routeNextButton = document.getElementById('route-next');
+routeNextButton.addEventListener('click',toggleNewRouteDrawer);
+
+/* toggle next button visibility when called */
+function toggleNextButton() {
+    const button = document.getElementById('route-next');
+    toggleHideElements([button]);
+};
+
+function hideNextButton() {
+    const button = document.getElementById('route-next');
+    if (button.classList.contains('show')) {
+        toggleNextButton();
+    };
+};
 
 /* listener close new route drawer button */
 const newRouteCloseButton = document.getElementById('close-new-route');
@@ -154,14 +168,21 @@ newRouteCloseButton.addEventListener('click',toggleNewRouteDrawer);
 /* toggle new route drawer */
 function toggleNewRouteDrawer() {
     const drawer = document.getElementById('new-route-drawer');
+    const colorPicker = document.getElementById('id_route_color');
     const instructionsBox = document.getElementById('new-route-instructions');
-    
+    const nextButton = document.getElementById('route-next');
+
+
     /* open or close the new route drawer as appropriate, hide new route instructions if needed*/
     if (instructionsBox.classList.contains('show')) {
         toggleHideElements([instructionsBox]);
     };
+    if ((drawer.classList.contains('hide') && nextButton.classList.contains('show')) || (drawer.classList.contains('show') && nextButton.classList.contains('hide'))) {
+        toggleNextButton();
+    };
     toggleHideElements([drawer]);
-    
+    /* set the color picker to the default color */
+    colorPicker.value = '#9999ff';
 };
 
 /* close new route drawer if open */
@@ -191,13 +212,13 @@ function dragListener() {
             route2 = this;
             swapRoutes(route1, route2);
         };
-    }
+    };
 };
 
-/* swap routes in list */
+/* swap routes in list and on map */
 function swapRoutes(route1, route2) {
     const parent = route1.parentNode;
-    const nextRoute = route2.nextSibling;
+    const nextRoute = route2.nextElementSibling;
 
     /* If route2 is right after route1, use adjacent logic */
     if (nextRoute === route1) {
@@ -213,40 +234,63 @@ function swapRoutes(route1, route2) {
             parent.appendChild(route1);
         };
     };
-};
 
-/* listener for save route order button */
-const saveOrderButton = document.getElementById('save-order');
-saveOrderButton.addEventListener('click', saveRouteOrder);
+    /* update the route order in the order form */
+    saveRouteOrder();
 
-/* update route order */
-function updateRouteOrder() {
-    const routeContainer = document.getElementById('route-container');
-    const routes = routeContainer.querySelectorAll('li');
+    /* find the last route in the list */
+    const lastRoute = parent.lastElementChild;
 
-    /* ensure route order is numerical */
-    let incrementer = 1;
-    for (li of routes) {
-        li.setAttribute('route-layer', incrementer);
-        incrementer += 1;
+    /* update the layers of all routes */
+    const routes = getAllPreviousSiblings(lastRoute);
+    for (route of routes) {
+        /* get the next sibling, and place it after the route using the layer ids defined when the layers were created*/
+        map.moveLayer('route' + String(route.nextElementSibling.getAttribute('route-id')), 'route' + String(route.getAttribute('route-id')));
     };
 };
 
-/* Save new route order */
+/* function to get all routes above the moved route */
+function getAllPreviousSiblings(element) {
+    let siblings = [];
+    while (element = element.previousElementSibling) {
+        siblings.unshift(element);
+    }
+    return siblings;
+};
+
+/* function to update the new order and opacity of the routes */
 function saveRouteOrder() {
-    updateRouteOrder();
+    const routeContainer = document.getElementById('route-container');
+    const routes = routeContainer.querySelectorAll('li');
+    const routeOrder = [];
+    const routeOpacity = [];
+
+    /* fill arrays with the route order and opacity */
+    for (li of routes) {
+        routeOrder.push(li.getAttribute('route-id'));
+        routeOpacity.push(li.getAttribute('route-visible'));
+    };
+
+    /* combile the arrays into csv strings */
+    const orderString = routeOrder.join(',');
+    const opacityString = routeOpacity.join(',');
+
+    /* update the route order and opacity in the form */
+    document.getElementById('id_route_order').value = orderString;
+    document.getElementById('id_route_opacity').value = opacityString;
+
 };
 
 /* listener for modify route buttons */
 const modifyButtonContainer = document.getElementById('route-container');
-modifyButtonContainer.addEventListener('click', openModifyRoute);
+modifyButtonContainer.addEventListener('click', routesOptionsButtons);
 
 /* listener for close modify route button*/
 const closeModifyRouteButton = document.getElementById('close-route-details');
 closeModifyRouteButton.addEventListener('click', closeModifyRoute);
 
 /* open the modify route drawer and populate the form with the appropriate data */
-function openModifyRoute(e) {
+function routesOptionsButtons(e) {
     const modifyDrawer = document.getElementById('route-details-drawer');
     /* if called by route-details button, populate form */
     if (e.target.classList.contains('route-details')) {
@@ -264,6 +308,28 @@ function openModifyRoute(e) {
         /* also poulate delete form, in case it is needed */
         document.getElementById('delete_route_id').value = routeId;
         toggleHideElements([modifyDrawer]);
+    };
+    /* if called by opacity toggle, toggle the route's opacity */
+    if (e.target.classList.contains('opacity-toggle')) {
+        let routeId = e.target.id;
+        let routeOpacity = e.target.closest('#route-data').getAttribute('route-visible');
+        /* using the layer ids defined when the layers were created, toggle the route layer opacity */
+        if (routeOpacity == 'True') {
+            e.target.closest('#route-data').setAttribute('route-visible', 'False');
+            map.setLayoutProperty('route' + routeId, 'visibility', 'none');
+        } else {
+            e.target.closest('#route-data').setAttribute('route-visible', 'True');
+            map.setLayoutProperty('route' + routeId, 'visibility', 'visible');
+        };
+        /* toggle text for hide/show */
+        if (e.target.textContent == 'Show') {
+            e.target.textContent = "Hide";
+        } else {
+            e.target.textContent = "Show";
+        }
+
+        /* update the route's opacity in the order form */
+        saveRouteOrder();
     };
 };
 
@@ -301,11 +367,14 @@ resetRouteTraceButton.addEventListener('click', resetRouteTrace);
 function resetRouteTrace() {
     draw.deleteAll();
     draw.changeMode('draw_line_string');
+    tryCloseNewRouteDrawer();
+    hideNextButton();
 }
 
 /* new route addition logic below */
 /* call function to update the route form as needed */
 map.on('draw.create', updateLine);
+map.on('draw.create', toggleNewRouteDrawer);
 map.on('draw.update', updateLine);
 
 /* update the trace coordinates in the form */
@@ -365,6 +434,9 @@ function renderRouteLayer(feature) {
             'line-width': 5
         }
     });
+    if (!feature.properties.route_visible) {
+        map.setLayoutProperty(route_id, 'visibility', 'none');
+    }
 }
 
 

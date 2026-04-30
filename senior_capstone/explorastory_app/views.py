@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from .models import Route, Passenger
-from django.contrib.gis.geos import LineString
 from django.core.serializers import serialize
+from django.contrib.auth.models import User
 
-from .forms import NewRouteForm, ModifyRouteForm, DeleteRouteForm
+from .forms import NewRouteForm, ModifyRouteForm, DeleteRouteForm, RegistrationForm, ChangeRouteOrder
 
 import json
 
@@ -17,15 +17,18 @@ def index(request):
 
     current_user = request.user
     routes = Route.objects.filter(user=current_user).order_by('route_layer')
-    route_data = json.loads(serialize('geojson', routes))
+    # provide route data to the map in reverse order for rendering process
+    route_data = json.loads(serialize('geojson', Route.objects.filter(user=current_user).order_by('-route_layer')))
 
     # for post requests, process the form
     if request.method == "POST":
         form_new = NewRouteForm(request.POST)
         modify_form = ModifyRouteForm(request.POST)
         delete_form = DeleteRouteForm(request.POST)
+        order_form = ChangeRouteOrder(request.POST)
 
         # validate the correct form!
+        # runs if the submitted for in the route creation form
         if 'submit-new-route' in request.POST:
             # check whether it's valid:
             if form_new.is_valid():
@@ -51,6 +54,7 @@ def index(request):
                 # reload the page:
                 return HttpResponseRedirect("index")
             
+        # runs if the submitted form is the route modification form
         elif 'submit-route-modification' in request.POST:
             # check whether it's valid:
             if modify_form.is_valid():
@@ -69,8 +73,9 @@ def index(request):
 
                 return HttpResponseRedirect("index")
             
+        # runs if the submitted form is the route deletion form
         elif 'submit-route-delete' in request.POST:
-            # check whether it's valid:
+            # check whether it's valid
             if delete_form.is_valid():
                 route = delete_form.cleaned_data["route_id"]
                 # verify that the user actually created the route they want to delete
@@ -79,12 +84,33 @@ def index(request):
                     # delete the route
                     delete_route_check.delete()
                 return HttpResponseRedirect("index")
+        
+        elif 'submit-route-order' in request.POST:
+            # check whether it's valid
+            if order_form.is_valid():
+                route_order = order_form.cleaned_data["route_order"].split(',')
+                route_opacity = order_form.cleaned_data["route_opacity"].split(',')
+                order_counter = 1
+
+                #update the routes with the new order and the new opacity, if the route was created by the active user
+                for i in range(len(route_order)):
+                    route = int(route_order[i])
+                    opacity = route_opacity[i]=='True'
+                    
+                    # verify that the route was created by the user
+                    if Route.objects.filter(route_id=route, user=current_user).count() == 1:
+                        modify_route = Route(route_id=route, route_layer=order_counter, route_visible=opacity)
+                        modify_route.save(update_fields=["route_layer", "route_visible"])
+                        order_counter += 1
+                
+                return HttpResponseRedirect("index")
 
     # for non-post requests, pass empty form
     else:
         form_new = NewRouteForm()
         modify_form = ModifyRouteForm()
         delete_form = DeleteRouteForm()
+        order_form = ChangeRouteOrder()
     
     context = {
         'user_routes' : routes,
@@ -92,10 +118,27 @@ def index(request):
         'username' : current_user,
         'form_new' : form_new,
         'modify_form': modify_form,
-        'delete_form': delete_form
+        'delete_form': delete_form,
+        'order_form': order_form
     }
     
     return render(request, 'explorastory_app/index.html', context)
 
 def login(request):
     return render(request, 'registration/login.html')
+
+def create_profile(request):
+
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login') # Redirect after successful signup
+    else:
+        form = RegistrationForm()
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'registration/create_profile.html', context)

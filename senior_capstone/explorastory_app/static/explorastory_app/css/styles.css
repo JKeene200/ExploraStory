@@ -10,6 +10,11 @@ body, header, nav, main, footer, img, h1, h2, ul, li{
 	padding: 0;
 	border: 0;
 }
+/* hide all form errors */
+.errorlist {
+	display: none;
+}
+
 
 /* Styles for Mobile */
 .logo {
@@ -54,7 +59,7 @@ nav {
 
 #add-route-menu.show {
 	display: grid;
-	grid-template-columns: auto auto auto;
+	grid-template-columns: auto auto;
 }
 
 .hide {
@@ -138,6 +143,11 @@ main {
 #route-container button {
 	margin: 0.5em;
 	width: 90%;
+}
+
+#route-item-menu {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
 }
 
 #route-data {

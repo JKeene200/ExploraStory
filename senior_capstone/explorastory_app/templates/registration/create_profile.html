@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<!--
+	Josiah Keene
+	create_profile.html
+	3/3/26
+-->
+<html lang="en">
+	<head>
+		<title>ExploraStory Create Profile</title>
+		<meta charset="utf-8">
+        <link rel="icon" type="image/png" href="{% static 'explorastory_app/images/favicon.png' %}">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="{% static 'explorastory_app/css/styles.css' %}">
+	</head>
+
+    <body>
+        <header></header>
+        <nav></nav>
+        <main>
+            <div id="profile-decor">
+                <img src="{% static 'explorastory_app/images/logo.svg' %}" alt="explorastory logo" class="large-logo">
+                <h1>ExploraStory</h1>
+            </div>
+            <div id="profile-form">
+                <h1>Create your account:</h1>
+
+                <form method="post" action="{% url 'explorastory/create_profile' %}">
+                    {% csrf_token %}
+                    {{form.as_p}}
+                    <input type="submit">
+                </form>
+            </div>
+        </main>
+        <footer>
+            <p>&copy; Copyright 2026. All Rights Reserved.</p>
+        </footer>
+    </body>
+</html>

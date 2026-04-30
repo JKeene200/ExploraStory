@@ -1,5 +1,5 @@
 {% load static %}
-<li route-id="{{route.route_id}}" id="route-data" draggable="true" route-layer="{{route.route_layer}}">
+<li route-id="{{route.route_id}}" id="route-data" draggable="true" route-visible="{{route.route_visible}}">
     <div id="route-grip">
         <p>|||</p>
     </div>
@@ -13,6 +13,10 @@
         <div id="route-date">
             <p>{{route.route_date}}</p>
         </div>
-        <button id="{{route.route_id}}" class="route-details">Details</button>
+        <div id="route-item-menu">
+            <button id="{{route.route_id}}" class="route-details">Details</button>
+            <button id="{{route.route_id}}" class="opacity-toggle">{% if route.route_visible %}Hide{% else %}Show{%endif%}</button>
+        </div>
+        
     </div>
 </li>

@@ -3,7 +3,7 @@
 <!--
 	Josiah Keene
 	index.html
-	2/9/26
+	4/21/26
 -->
 <html lang="en">
 	<head>
@@ -42,7 +42,6 @@
 					<button id="options-close">Back</button>
 				</div>
 				<div id="add-route-menu" class="hide">
-					<button id="new-route-toggle">Menu</button>
 					<button id="reset-route-trace">Reset Route</button>
 					<button id="cancel-add-route">Cancel</button>
 				</div>
@@ -57,7 +56,11 @@
 
 			<div id="route-drawer" class="hide">
 				<div id="route-drawer-menu">
-					<button id="save-order">Save</button>
+					<form id="order-form" method="post" action="{% url 'index' %}">
+						{% csrf_token %}
+						{{ order_form }}
+						<input id="save-order" type="submit" name="submit-route-order" value="Save Changes">
+					</form>
 					<button id="route-cancel">Cancel</button>
 				</div>
 				<ul id="route-container">
@@ -127,6 +130,7 @@
 				</div>
 			</div>
 			
+			<button id="route-next" class="center-btn hide">Next</button>
 
 			<div id="profile-drawer" class="hide">
 				<div id="profile-drawer-menu">

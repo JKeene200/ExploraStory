@@ -54,6 +54,9 @@
                 </form>
 
                 {# Assumes you set up the password_reset view in your URLconf #}
+                <p><a href="{% url 'explorastory/create_profile' %}">Create a Profile</a></p>
+
+                {# Assumes you set up the password_reset view in your URLconf #}
                 <p><a href="{% url 'explorastory/password_reset' %}">Lost password?</a></p>
             </div>
         </main>
