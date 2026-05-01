@@ -15,6 +15,8 @@
 		<link href="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.css" rel="stylesheet">
 		<script src="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.js"></script>
 		<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.5.1/mapbox-gl-draw.js"></script>
+		<link href='https://watergis.github.io/mapbox-gl-export/mapbox-gl-export.css' rel='stylesheet'>
+		<script src="https://watergis.github.io/mapbox-gl-export/mapbox-gl-export.js"></script>
 		<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.5.1/mapbox-gl-draw.css" type="text/css">
 		<script defer src="{% static 'explorastory_app/js/index.js' %}"></script>
 		{{ render_data|json_script:'data-storage' }}
@@ -27,6 +29,7 @@
 				<p class="user-display">{{username}}</p>
 			</header>
 
+			<!-- the menu for the site, which changes as needed by hiding and showing different divs -->
 			<nav>
 				<div id="default-menu" class="show">
 					<button id="route-toggle">Routes</button>
@@ -37,7 +40,7 @@
 					</form>
 				</div>
 				<div id="options-menu" class="hide">
-					<button id="export-page">Export Map</button>
+					<button id="screenshot-toggle">Export Map</button>
 					<button id="profile-settings">Profile</button>
 					<button id="options-close">Back</button>
 				</div>
@@ -50,94 +53,103 @@
 		
 		<main>
 
+			<!-- The map lives in this div -->
 			<div id="map"></div>
 
-			<button id="add" class="center-btn show">Add Route</button>
+			<div id="content" class="show">
+				<!-- This is the button to add a new route -->
+				<button id="add" class="center-btn show">Add Route</button>
 
-			<div id="route-drawer" class="hide">
-				<div id="route-drawer-menu">
-					<form id="order-form" method="post" action="{% url 'index' %}">
-						{% csrf_token %}
-						{{ order_form }}
-						<input id="save-order" type="submit" name="submit-route-order" value="Save Changes">
-					</form>
-					<button id="route-cancel">Cancel</button>
-				</div>
-				<ul id="route-container">
-					{% if user_routes|length == 0%}
-						<p>You have no routes. Once you add a route, it will appear here.</p>
-					{% else %}
-						{% for route in user_routes%}
-							{% include 'explorastory_app/snippets/routedata.html'%}
-						{% endfor %}
-					{% endif %}
-				</ul>
-			</div>
-
-			<div id="new-route-instructions" class="hide">
-				<div id="popup-header">
-					<h1>Directions:</h1>
-					<button id="instructions-popup-close">&times;</button>
-				</div>
-				<p>Add points to your route by selecting where on the map you want the route to change directions. To end the route, select the last point you placed. You can adjust the location of points and add new points in the middle of your route after ending the route by double clicking on it.</p>
-			</div>
-
-			<button id="route-next-step" class="center-btn hide">Next</button>
-
-			<div id="new-route-drawer" class="hide">
-				<div id="new-route-drawer-menu">
-					<button id="close-new-route">Back</button>
-				</div>
-				<div id="new-route-container">
-					<form id="new-route-form" method="post" action="{% url 'index' %}">
-						{% csrf_token %}
-						{{ form_new }}
-						<input id="save-form" type="submit" name="submit-new-route" value="Save">
-               		</form>
-				</div>
-			</div>
-
-			<div id="route-details-drawer" class="hide">
-				<div id="route-details-drawer-menu">
-					<p>Route Details</p>
-					<button id="close-route-details">Exit</button>
-				</div>
-				<div id="route-details-container">
-					<form id="modify-route-form" method="post" action="{% url 'index' %}">
-						{% csrf_token %}
-						{{ modify_form }}
-						<input id="save-form" type="submit" name="submit-route-modification" value="Save Changes">
-               		</form>
-					<button id="delete-route">Delete Route</button>
-				</div>
-			</div>
-
-			<div id="delete-route-popup" class="hide">
-				<div id="popup-header">
-					<h1>Delete Route:</h1>
-					<button id="delete-popup-close">&times;</button>
-				</div>
-				<div id="delete-route-content">
-					<p>Are you sure you want to permanently delete this route?</p>
-					<div id="delete-menu">
-						<form id="delete-route-form" method="post" action="{% url 'index' %}">
+				<!-- This is the div for displaying the list of the user's routes -->
+				<div id="route-drawer" class="hide">
+					<div id="route-drawer-menu">
+						<form id="order-form" method="post" action="{% url 'index' %}">
 							{% csrf_token %}
-							{{ delete_form }}
-							<input id="save-form" type="submit" name="submit-route-delete" value="Delete">
-               			</form>
-						<button id="cancel-delete">Cancel</button>
+							{{ order_form }}
+							<input id="save-order" type="submit" name="submit-route-order" value="Save Changes">
+						</form>
+						<button id="route-cancel">Cancel</button>
+					</div>
+					<ul id="route-container">
+						{% if user_routes|length == 0%}
+							<p>You have no routes. Once you add a route, it will appear here.</p>
+						{% else %}
+							{% for route in user_routes%}
+								{% include 'explorastory_app/snippets/routedata.html'%}
+							{% endfor %}
+						{% endif %}
+					</ul>
+				</div>
+
+				<!-- This div is a popup with instructions about how to add a new route to the map -->
+				<div id="new-route-instructions" class="hide">
+					<div id="popup-header">
+						<h1>Directions:</h1>
+						<button id="instructions-popup-close">&times;</button>
+					</div>
+					<p>Add points to your route by selecting where on the map you want the route to change directions. To end the route, select the last point you placed. You can adjust the location of points and add new points in the middle of your route after ending the route by double clicking on it.</p>
+				</div>
+
+				<!-- This div is to hold the information form for adding a new route -->
+				<div id="new-route-drawer" class="hide">
+					<div id="new-route-drawer-menu">
+						<button id="close-new-route">Back</button>
+					</div>
+					<div id="new-route-container">
+						<form id="new-route-form" method="post" action="{% url 'index' %}">
+							{% csrf_token %}
+							{{ form_new }}
+							<input id="save-form" type="submit" name="submit-new-route" value="Save">
+						</form>
 					</div>
 				</div>
-			</div>
-			
-			<button id="route-next" class="center-btn hide">Next</button>
 
-			<div id="profile-drawer" class="hide">
-				<div id="profile-drawer-menu">
-					<button>Change Username</button>
-					<button>Change Password</button>
-					<button>Delete Profile</button>
-					<button id="close-profile">Close</button>
+				<!-- This div is to display the details of the selected route -->
+				<div id="route-details-drawer" class="hide">
+					<div id="route-details-drawer-menu">
+						<p>Route Details</p>
+						<button id="close-route-details">Exit</button>
+					</div>
+					<div id="route-details-container">
+						<form id="modify-route-form" method="post" action="{% url 'index' %}">
+							{% csrf_token %}
+							{{ modify_form }}
+							<input id="save-form" type="submit" name="submit-route-modification" value="Save Changes">
+						</form>
+						<button id="delete-route">Delete Route</button>
+					</div>
+				</div>
+
+				<!-- This div is to warn the user that they are about to delete a route -->
+				<div id="delete-route-popup" class="hide">
+					<div id="popup-header">
+						<h1>Delete Route:</h1>
+						<button id="delete-popup-close">&times;</button>
+					</div>
+					<div id="delete-route-content">
+						<p>Are you sure you want to permanently delete this route?</p>
+						<div id="delete-menu">
+							<form id="delete-route-form" method="post" action="{% url 'index' %}">
+								{% csrf_token %}
+								{{ delete_form }}
+								<input id="save-form" type="submit" name="submit-route-delete" value="Delete">
+							</form>
+							<button id="cancel-delete">Cancel</button>
+						</div>
+					</div>
+				</div>
+				
+				<!-- This button is to proceed from to route tracing to the information form for adding a new route -->
+				<button id="route-next" class="center-btn hide">Next</button>
+
+				<!-- This div is for the user profile menu -->
+				<div id="profile-drawer" class="hide">
+					<div id="profile-drawer-menu">
+						<button>Change Username</button>
+						<button>Change Password</button>
+						<button>Delete Profile</button>
+						<button id="close-profile">Close</button>
+					</div>
 				</div>
 			</div>
 

@@ -10,6 +10,7 @@ body, header, nav, main, footer, img, h1, h2, ul, li{
 	padding: 0;
 	border: 0;
 }
+
 /* hide all form errors */
 .errorlist {
 	display: none;
@@ -377,6 +378,7 @@ footer p {
 	margin-bottom: 0;
 }
 
+/* style rules for tablet and desktop */
 @media screen and (min-width: 500px), print {
 	
 	#banner {

@@ -35,12 +35,10 @@ function toggleHideElements(itemArray) {
 document.addEventListener('DOMContentLoaded', dragListener);
 
 /* listener open options menu */
-const optionsOpenButton = document.getElementById('user-options');
-optionsOpenButton.addEventListener('click',toggleOptionsMenu);
+document.getElementById('user-options').addEventListener('click',toggleOptionsMenu);
 
 /* listener close options menu */
-const optionsCloseButton = document.getElementById('options-close');
-optionsCloseButton.addEventListener('click',toggleOptionsMenu);
+document.getElementById('options-close').addEventListener('click',toggleOptionsMenu);
 
 /* toggle options menu */
 function toggleOptionsMenu() {
@@ -55,24 +53,26 @@ function toggleOptionsMenu() {
         /* close route drawer if it is open */
         if (routeDrawer.classList.contains('show')) {
             toggleRouteDrawer();
-        }
+        };
         toggleHideElements([defaultMenu, optionsMenu, addButton]);
     } else {
         /* close profile drawer if it is open */
         if (profileDrawer.classList.contains('show')) {
             toggleProfileDrawer();
-        }
+        };
         toggleHideElements([optionsMenu, defaultMenu, addButton]);
+        /* try to hide the screenshot controls */
+        if (screenshotControl) {
+            toggleScreenshot();
+        };
     };
 };
 
 /* listener toggle route drawer button */
-const routeToggleButton = document.getElementById('route-toggle');
-routeToggleButton.addEventListener('click',toggleRouteDrawer);
+document.getElementById('route-toggle').addEventListener('click',toggleRouteDrawer);
 
 /* listener close route drawer button */
-const routeCancelButton = document.getElementById('route-cancel');
-routeCancelButton.addEventListener('click',toggleRouteDrawer);
+document.getElementById('route-cancel').addEventListener('click',toggleRouteDrawer);
 
 /* toggle route drawer */
 function toggleRouteDrawer() {
@@ -86,24 +86,25 @@ function toggleRouteDrawer() {
 };
 
 /* listener toggle profile drawer button */
-const profileToggleButton = document.getElementById('profile-settings');
-profileToggleButton.addEventListener('click',toggleProfileDrawer);
+document.getElementById('profile-settings').addEventListener('click',toggleProfileDrawer);
 
 /* listener close profile drawer button */
-const profileCloseButton = document.getElementById('close-profile');
-profileCloseButton.addEventListener('click',toggleProfileDrawer);
+document.getElementById('close-profile').addEventListener('click',toggleProfileDrawer);
 
 /* toggle profile drawer */
 function toggleProfileDrawer() {
     const drawer = document.getElementById('profile-drawer');
-    
+    /* try to hide the screenshot controls */
+    if (screenshotControl) {
+        toggleScreenshot();
+    };
     /* open or close the profile drawer as appropriate */
     toggleHideElements([drawer]);
+    
 };
 
 /* listener add route button */
-const addRouteButton = document.getElementById('add');
-addRouteButton.addEventListener('click',toggleAddRouteScreen);
+document.getElementById('add').addEventListener('click',toggleAddRouteScreen);
 
 /* listener add route button */
 const cancelAddRouteButton = document.getElementById('cancel-add-route');
@@ -112,8 +113,7 @@ cancelAddRouteButton.addEventListener('click',hideNextButton);
 cancelAddRouteButton.addEventListener('click',toggleAddRouteScreen);
 
 /* listener close new route instructions box button */
-const closeNewRouteInstructions = document.getElementById('instructions-popup-close');
-closeNewRouteInstructions.addEventListener('click',toggleNewRouteInstructions);
+document.getElementById('instructions-popup-close').addEventListener('click',toggleNewRouteInstructions);
 
 /* add route screen */
 function toggleAddRouteScreen() {
@@ -145,8 +145,7 @@ function toggleNewRouteInstructions() {
 }
 
 /* listener toggle new route drawer button */
-const routeNextButton = document.getElementById('route-next');
-routeNextButton.addEventListener('click',toggleNewRouteDrawer);
+document.getElementById('route-next').addEventListener('click',toggleNewRouteDrawer);
 
 /* toggle next button visibility when called */
 function toggleNextButton() {
@@ -162,8 +161,7 @@ function hideNextButton() {
 };
 
 /* listener close new route drawer button */
-const newRouteCloseButton = document.getElementById('close-new-route');
-newRouteCloseButton.addEventListener('click',toggleNewRouteDrawer);
+document.getElementById('close-new-route').addEventListener('click',toggleNewRouteDrawer);
 
 /* toggle new route drawer */
 function toggleNewRouteDrawer() {
@@ -282,12 +280,10 @@ function saveRouteOrder() {
 };
 
 /* listener for modify route buttons */
-const modifyButtonContainer = document.getElementById('route-container');
-modifyButtonContainer.addEventListener('click', routesOptionsButtons);
+document.getElementById('route-container').addEventListener('click', routesOptionsButtons);
 
 /* listener for close modify route button*/
-const closeModifyRouteButton = document.getElementById('close-route-details');
-closeModifyRouteButton.addEventListener('click', closeModifyRoute);
+document.getElementById('close-route-details').addEventListener('click', closeModifyRoute);
 
 /* open the modify route drawer and populate the form with the appropriate data */
 function routesOptionsButtons(e) {
@@ -342,16 +338,13 @@ function closeModifyRoute() {
 }
 
 /* listener for delete route button */
-const deleteRouteButton = document.getElementById('delete-route');
-deleteRouteButton.addEventListener('click', toggleDeleteRoutePopup);
+document.getElementById('delete-route').addEventListener('click', toggleDeleteRoutePopup);
 
 /* listener for cancel delete route button */
-const cancelDeleteRouteButton = document.getElementById('cancel-delete');
-cancelDeleteRouteButton.addEventListener('click', toggleDeleteRoutePopup);
+document.getElementById('cancel-delete').addEventListener('click', toggleDeleteRoutePopup);
 
 /* listener for close delete route button */
-const closeDeleteRouteButton = document.getElementById('delete-popup-close');
-closeDeleteRouteButton.addEventListener('click', toggleDeleteRoutePopup);
+document.getElementById('delete-popup-close').addEventListener('click', toggleDeleteRoutePopup);
 
 /* open the delete route menu */
 function toggleDeleteRoutePopup() {
@@ -360,8 +353,7 @@ function toggleDeleteRoutePopup() {
 }
 
 /* listener reset route trace button */
-const resetRouteTraceButton = document.getElementById('reset-route-trace');
-resetRouteTraceButton.addEventListener('click', resetRouteTrace);
+document.getElementById('reset-route-trace').addEventListener('click', resetRouteTrace);
 
 /* Reset the trace if a mistake was made */
 function resetRouteTrace() {
@@ -415,7 +407,7 @@ function addRouteSource(feature) {
             }
         }
     });
-}
+};
 
 /* render route on map from source */
 function renderRouteLayer(feature) {
@@ -436,7 +428,35 @@ function renderRouteLayer(feature) {
     });
     if (!feature.properties.route_visible) {
         map.setLayoutProperty(route_id, 'visibility', 'none');
+    };
+};
+
+/* screenshot mode toggle on button */
+document.getElementById('screenshot-toggle').addEventListener('click', toggleScreenshot);
+
+/* variable to reference screenshot controls */
+let screenshotControl = null;
+
+/* function to capture a screenshot of the map */
+function toggleScreenshot() {
+    /* hide the profile drawer if needed */
+    if (document.getElementById('profile-drawer').classList.contains("show")) {
+        toggleProfileDrawer()
     }
-}
-
-
+    
+    /* toggle the screenshot control */
+    if (!screenshotControl) {
+        screenshotControl = new MapboxExportControl({
+            PageSize: Size.A6,
+            PageOrientation: PageOrientation.Portrait,
+            Format: Format.PNG,
+            DPI: DPI[96],
+            Crosshair: true,
+            PrintableArea: true,
+        }); 
+        map.addControl(screenshotControl, 'top-right');
+    } else {
+        map.removeControl(screenshotControl);
+        screenshotControl = null;
+    };
+};
